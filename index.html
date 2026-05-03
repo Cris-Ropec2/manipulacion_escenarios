@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js - Cristopher Rodríguez Pérez</title>
+    <title>Three.js Explorer - Christopher Rodríguez Pérez</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="./assets/img/favicon.png">
     <style>
@@ -15,117 +14,94 @@
             --dark-bg: #0f172a;
             --card-bg: #1e293b;
             --accent: #6366f1;
+            --text-muted: #cbd5e1; 
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--dark-bg);
             color: #f8fafc;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             margin: 0;
+            overflow: hidden; 
         }
 
         .navbar {
             background-color: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
+            flex-shrink: 0;
         }
 
-        /* UIverse inspired Card Style */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto; /* Permite scroll interno solo si el menú es muy grande */
+        }
+
+        /* UIverse Card Style */
         .uiverse-card {
             width: 100%;
-            height: 200px;
-            background: #212121;
+            height: 160px;
+            background: #1e293b;
             border-radius: 15px;
-            box-shadow: 15px 15px 30px #151515, -5px -5px 20px #292929;
+            box-shadow: 10px 10px 20px #0a0f1d;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px;
             text-align: center;
-            padding: 20px;
         }
 
         .uiverse-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-5px);
             border: 1px solid var(--primary-color);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
 
-        .uiverse-card h3 {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            font-weight: 600;
-            color: #fff;
-        }
+        .uiverse-card h3 { font-size: 1.1rem; color: #fff; margin-bottom: 5px; }
+        .text-muted { color: var(--text-muted) !important; font-size: 0.85rem; }
 
-        .uiverse-card p {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin: 0;
-        }
-
-        /* Demo Viewer Area */
+        /* Visor Area */
         #viewer-section {
             display: none;
+            flex-grow: 1;
+            flex-direction: column;
+            height: 100%;
         }
 
         .demo-frame-container {
-            width: 100%;
-            height: 70vh;
+            flex-grow: 1;
             background: #000;
-            border-radius: 20px;
+            border-radius: 15px;
             overflow: hidden;
             border: 2px solid var(--card-bg);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* Mini Nav for switching */
         .mini-nav {
             display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 10px 5px;
-            margin-bottom: 20px;
-            scrollbar-width: thin;
-        }
-
-        .mini-card {
-            min-width: 110px;
-            padding: 8px 15px;
-            background: var(--card-bg);
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            white-space: nowrap;
-        }
-
-        .mini-card:hover, .mini-card.active {
-            background: var(--primary-color);
-            color: white;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
         footer {
-            margin-top: auto;
-            padding: 40px 0;
+            flex-shrink: 0;
+            padding: 15px 0;
             background: #070a13;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .gradient-text {
@@ -138,104 +114,90 @@
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand fw-bold" href="#" onclick="showHome()">THREE.JS <span class="gradient-text">EXPLORER</span></a>
-            <div class="ms-auto">
-                <span class="badge bg-primary px-3 py-2">ITP - Sistemas</span>
-            </div>
+            <span class="badge bg-primary">ITP - Sistemas</span>
         </div>
     </nav>
 
-    <div class="container my-5">
-        
-        <!-- Main Menu -->
-        <div id="home-menu">
-            <div class="text-center mb-5">
-                <h1 class="display-4 fw-bold">Elije el demo que gustes</h1>
-                <p class="text-muted">Gráficos 3D - Manipulación de escenarios</p>
+    <div class="main-content">
+        <div class="container h-100 d-flex flex-column">
+            
+            <!-- MENÚ PRINCIPAL (HOME) -->
+            <div id="home-menu" class="my-auto">
+                <div class="text-center mb-5">
+                    <h1 class="fw-bold">Elije el demo que gustes</h1>
+                    <p class="text-muted">Proyectos de manipilación de escenarios por Cristopher Rodríguez Pérez</p>
+                </div>
+                
+                <div class="row g-4 justify-content-center">
+                    <!-- Demo 1: Minecraft -->
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="uiverse-card" onclick="loadDemo('minecraft.html', 'Minecraft World')">
+                            <h3>Minecraft</h3>
+                            <p class="text-muted">Geometry</p>
+                        </div>
+                    </div>
+                    <!-- Demo 2: Map -->
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="uiverse-card" onclick="loadDemo('map.html', 'Map Controls')">
+                            <h3>Map</h3>
+                            <p class="text-muted">Navigation</p>
+                        </div>
+                    </div>
+                    <!-- Demo 3: Orbit -->
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="uiverse-card" onclick="loadDemo('orbit.html', 'Orbit Controls')">
+                            <h3>Orbit</h3>
+                            <p class="text-muted">Rotation</p>
+                        </div>
+                    </div>
+                    <!-- Demo 4: FPS -->
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="uiverse-card" onclick="loadDemo('pointerlock.html', 'PointerLock FPS')">
+                            <h3>FPS</h3>
+                            <p class="text-muted">First Person</p>
+                        </div>
+                    </div>
+                    <!-- Demo 5: Transform -->
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="uiverse-card" onclick="loadDemo('transform.html', 'Transform Controls')">
+                            <h3>Transform</h3>
+                            <p class="text-muted">Manipulation</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="row g-4 justify-content-center">
-                <!-- Minecraft -->
-                <div class="col-6 col-md-4 col-lg-2">
-                    <div class="uiverse-card" onclick="loadDemo('minecraft.html', 'Minecraft World')">
-                        <h3>Minecraft</h3>
-                        <p>Geometry</p>
-                    </div>
+            <!-- VISOR DE DEMOS -->
+            <div id="viewer-section">
+                <div class="mini-nav">
+                    <button class="btn btn-sm btn-outline-light" onclick="loadDemo('minecraft.html', 'Minecraft')">Minecraft</button>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadDemo('map.html', 'Map')">Map</button>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadDemo('orbit.html', 'Orbit')">Orbit</button>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadDemo('pointerlock.html', 'FPS')">FPS</button>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadDemo('transform.html', 'Transform')">Transform</button>
+                    <button class="btn btn-sm btn-danger ms-auto" onclick="showHome()">Cerrar Demo</button>
                 </div>
-                <!-- Map -->
-                <div class="col-6 col-md-4 col-lg-2">
-                    <div class="uiverse-card" onclick="loadDemo('map.html', 'Map Controls')">
-                        <h3>Map</h3>
-                        <p>Navigation</p>
-                    </div>
-                </div>
-                <!-- Orbit -->
-                <div class="col-6 col-md-4 col-lg-2">
-                    <div class="uiverse-card" onclick="loadDemo('orbit.html', 'Orbit Controls')">
-                        <h3>Orbit</h3>
-                        <p>Rotation</p>
-                    </div>
-                </div>
-                <!-- PointerLock -->
-                <div class="col-6 col-md-4 col-lg-2">
-                    <div class="uiverse-card" onclick="loadDemo('pointerlock.html', 'PointerLock FPS')">
-                        <h3>FPS</h3>
-                        <p>First Person</p>
-                    </div>
-                </div>
-                <!-- Transform -->
-                <div class="col-6 col-md-4 col-lg-2">
-                    <div class="uiverse-card" onclick="loadDemo('transform.html', 'Transform Controls')">
-                        <h3>Transform</h3>
-                        <p>Manipulation</p>
-                    </div>
+                
+                <h4 id="current-title" class="gradient-text mb-2">Selecciona un demo</h4>
+                
+                <div class="demo-frame-container">
+                    <iframe id="main-frame" src=""></iframe>
                 </div>
             </div>
+
         </div>
-
-        <!-- Viewer Section -->
-        <div id="viewer-section">
-            <div class="mini-nav">
-                <div class="mini-card" onclick="loadDemo('minecraft.html', 'Minecraft World')">Minecraft</div>
-                <div class="mini-card" onclick="loadDemo('map.html', 'Map Controls')">Map</div>
-                <div class="mini-card" onclick="loadDemo('orbit.html', 'Orbit Controls')">Orbit</div>
-                <div class="mini-card" onclick="loadDemo('pointerlock.html', 'PointerLock FPS')">FPS</div>
-                <div class="mini-card" onclick="loadDemo('transform.html', 'Transform Controls')">Transform</div>
-                <div class="mini-card bg-danger text-white border-0" onclick="showHome()">Volver al Inicio</div>
-            </div>
-
-            <div class="mb-3 d-flex justify-content-between align-items-end">
-                <div>
-                    <h2 id="current-title" class="h3 mb-1 gradient-text">Demo Seleccionado</h2>
-                    <p class="small text-muted mb-0">Usa el mouse para interactuar con la escena</p>
-                </div>
-            </div>
-
-            <div class="demo-frame-container">
-                <iframe id="main-frame" src=""></iframe>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Footer -->
     <footer>
         <div class="container text-center">
-            <h5 class="fw-bold mb-1">Cristopher Rodríguez Pérez</h5>
-            <p class="small text-muted mb-3">Ingeniería en Sistemas Computacionales</p>
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <span class="badge border border-secondary text-secondary">Instituto Tecnológico de Pachuca</span>
-                <span class="badge border border-primary text-primary">Graficación 3D</span>
-            </div>
+            <h6 class="fw-bold mb-1">Cristopher Rodríguez Pérez - 23200892</h6>
+            <p class="text-muted mb-0">Ingeniería en Sistemas Computacionales | Instituto Tecnológico de Pachuca</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
         const homeMenu = document.getElementById('home-menu');
         const viewerSection = document.getElementById('viewer-section');
@@ -244,27 +206,15 @@
 
         function loadDemo(url, title) {
             homeMenu.style.display = 'none';
-            viewerSection.style.display = 'block';
+            viewerSection.style.display = 'flex';
             mainFrame.src = url;
             currentTitle.innerText = title;
-            
-            // Actualizar estado activo en la mini navegación
-            const miniCards = document.querySelectorAll('.mini-card');
-            miniCards.forEach(card => {
-                card.classList.remove('active');
-                if(title.includes(card.innerText)) {
-                    card.classList.add('active');
-                }
-            });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function showHome() {
             homeMenu.style.display = 'block';
             viewerSection.style.display = 'none';
             mainFrame.src = "";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
